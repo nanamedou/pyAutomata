@@ -623,6 +623,8 @@ class NFA:
             for t, w in edge.items():
                 G.edge(str(s), str(t), label=edge[t])
 
+        print(G)
+
         G.render(path)
 
     # check automaton accept string or not

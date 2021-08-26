@@ -592,37 +592,18 @@ class PDA:
         self.initial_stack_state = tuple(initial_stack_state)
         self.accepting_stetes = set(accepting_stetes)
 
-    def input_symbol(self, symbol):
-        cur_nodes = deque([(self.start_state, self.initial_stack_state)])
+    def input_symbol(self, state, stack_last, input_symbol):
 
-        next_nodes = deque([])
-        for state, stack in cur_nodes:
+        # T(state, stack_last, input_symbol)
+        #   = {(next_state, next_stack_last)}
+        next_datas = self.transition_relation.get((state, stack_last, input_symbol))
+        if(next_datas is None):
+            return set()
 
-            # T(state, stack_front, input)
-            #   = {(next_state, next_stack_front[])}
-            stack_front = EPCILON
-            if(len(stack) > 0):
-                stack_front = stack[0]
-            next_datas = self.transition_relation.get((state, stack_front, symbol))
-            if(next_datas is None):
-                continue
-
-            # next_state = next_state
-            # next_stack = next_stack_front  + stack[]
-            for next_state, next_stack_front in next_datas:
-                next_stack = (*next_stack_front, *stack[1:])
-                next_state_tuple = (next_state, next_stack)
-                next_nodes.append(next_state_tuple)
+        results = set()
+        for next_state, next_stack_last in next_datas:
+            results.add((next_state, next_stack_last))
 
         # exist state in self.accepting_stetes
 
-        return [PDA(
-            self.states,
-            self.input_symbols,
-            self.stack_symbols,
-            self.transition_relation,
-            state,
-            stack,
-            self.accepting_stetes
-        )
-            for state, stack in next_nodes]
+        return results
